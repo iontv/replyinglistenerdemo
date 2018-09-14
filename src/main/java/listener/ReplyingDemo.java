@@ -1,6 +1,7 @@
 package listener;
 
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,9 +30,11 @@ public class ReplyingDemo {
 
     @KafkaListener(id = "server", topics = "kRequests")
     @SendTo // use default replyTo expression
-    public String listen(String in) {
-        LOGGER.info(MESSAGE_RECEIVED_TEMPLATE, in);
-        return in.toUpperCase();
+    public String listen(ConsumerRecord<String, String> consumerRecord ) {
+        LOGGER.info(MESSAGE_RECEIVED_TEMPLATE, consumerRecord);
+        // LOGGER.info(String.valueOf(consumerRecord.headers().lastHeader("kafka_replyTopic").value()));
+        // LOGGER.info(consumerRecord.headers().lastHeader("kafka_correlationId").value().toString());
+        return consumerRecord.toString();
     }
 
     @Bean
